@@ -1,6 +1,33 @@
+## AWS infrastuckture provisioning with Terrform
+
+This is a sample project to get started with AWS infra provisioning using terraform.
+
+### Prerequisites
+- AWS CLI
+  ```
+  brew install awscli
+  ```
+- Terraform CLI
+  ```
+  brew install terraform
+  ```
+- TFSEC
+    ```
+    brew install tfsec
+    ```
+
+#### AWS IAM User
+Create a separate IAM user with following permissions. DO NOT use the root user for this. 
+![alt text](image.png)
+#### Configure AWS Credentials
+Use the access key and secret from the newly created IAM user to configure aws cli.
+```
+aws configure
+```
+
 #### AWS Private Key
 
-Create if you dont have one already.
+Create if you dont have one already. This is the private key and keep it safe.
 
 ```
 aws ec2 create-key-pair \
@@ -19,10 +46,21 @@ chmod 400 my-key-pair.pem
 alias tf=terraform
 ```
 
-#### Initialize and deploy
+### Working with Terraform
+
+Intialize terraform. This will initialize terraform provider defined in the configuration file.
 
 ```
 tf init
+```
+Perform static analysis of tf script. This will highlight potential misconfigurations and security risks. 
+```
+tfsec .
+```
+
+Use below commands to provision and destroy the AWS infra. 
+
+```
 tf plan
 tf apply
 tf destroy
