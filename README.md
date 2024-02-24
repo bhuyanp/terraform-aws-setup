@@ -61,6 +61,7 @@ tfsec .
 Use below commands to provision and destroy the AWS infra. 
 
 ```
+tf validate
 tf plan
 tf apply
 tf destroy

@@ -9,7 +9,7 @@ terraform {
 
 locals {
   NAME = "tf-poc"
-  APP  = "Terraform POC"
+
   //create the keypair before applying this 
   KEY_NAME = "my-key-pair"
   //Amazon Linux 2023 AMI (64-bit (x86)) without uefi. 
@@ -19,15 +19,17 @@ locals {
 
 # Configure the AWS Provider
 provider "aws" {
-  region = "us-east-1"
+  region = var.region
 }
+
+
 
 # Create a VPC
 resource "aws_vpc" "tfvpc" {
   cidr_block = "10.0.0.0/16"
   tags = {
     Name = "${local.NAME}-vpc"
-    App  = local.APP
+    App  = var.app-name
   }
 }
 
@@ -36,7 +38,7 @@ resource "aws_internet_gateway" "tfvpc-gw" {
   vpc_id = aws_vpc.tfvpc.id
   tags = {
     Name = "${local.NAME}-vpc-gw"
-    App  = local.APP
+    App  = var.app-name
   }
 }
 
@@ -47,7 +49,7 @@ resource "aws_subnet" "tfvpc-pubsubnet" {
 
   tags = {
     Name = "${local.NAME}-vpc-pubsubnet"
-    App  = local.APP
+    App  = var.app-name
   }
 }
 
@@ -58,7 +60,7 @@ resource "aws_subnet" "tfvpc-pvtsubnet" {
 
   tags = {
     Name = "${local.NAME}-vpc-pvtsubnet"
-    App  = local.APP
+    App  = var.app-name
   }
 }
 
@@ -72,7 +74,7 @@ resource "aws_route_table" "tfvpc-pubrt" {
   }
   tags = {
     Name = "${local.NAME}-tfvpc-pubrt"
-    App  = local.APP
+    App  = var.app-name
   }
 }
 resource "aws_route_table_association" "a" {
@@ -86,7 +88,7 @@ resource "aws_security_group" "pub-ec2-sg" {
   vpc_id = aws_vpc.tfvpc.id
   tags = {
     Name = "${local.NAME}-pub-ec2-sg"
-    App  = local.APP
+    App  = var.app-name
   }
 }
 # Security Group Inbound Rule
@@ -114,7 +116,7 @@ resource "aws_instance" "tfpoc-pub" {
   key_name                    = local.KEY_NAME
   tags = {
     Name = "${local.NAME}-ec2-pub"
-    App  = local.APP
+    App  = var.app-name
   }
 }
 
@@ -129,7 +131,7 @@ resource "aws_nat_gateway" "ng" {
 
   tags = {
     Name = "${local.NAME}-ng"
-    App  = local.APP
+    App  = var.app-name
   }
   # To ensure proper ordering, it is recommended to add an explicit dependency
   # on the Internet Gateway for the VPC.
@@ -145,7 +147,7 @@ resource "aws_route_table" "tfvpc-pvtrt" {
   }
   tags = {
     Name = "${local.NAME}-tfvpc-pvtrt"
-    App  = local.APP
+    App  = var.app-name
   }
 }
 resource "aws_route_table_association" "pvt" {
@@ -159,7 +161,7 @@ resource "aws_security_group" "pvt-ec2-sg" {
   vpc_id = aws_vpc.tfvpc.id
   tags = {
     Name = "${local.NAME}-pvt-ec2-sg"
-    App  = local.APP
+    App  = var.app-name
   }
 }
 # Security Group Inbound Rule
@@ -186,17 +188,6 @@ resource "aws_instance" "tfpoc-pvt" {
   key_name        = local.KEY_NAME
   tags = {
     Name = "${local.NAME}-ec2-pvt"
-    App  = local.APP
+    App  = var.app-name
   }
-}
-
-
-
-
-output "pub-ec2-public_ip" {
-  value = aws_instance.tfpoc-pub.public_ip
-}
-
-output "pvt-ec2-private_ip" {
-  value = aws_instance.tfpoc-pvt.private_ip
 }
