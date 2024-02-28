@@ -2,6 +2,8 @@
 
 This is a sample project to get started with AWS infra provisioning using terraform.
 
+### Architecture Diagram
+![alt text](arch-diagram.png)
 ### Prerequisites
 - AWS CLI
   ```
